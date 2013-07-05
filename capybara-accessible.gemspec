@@ -20,10 +20,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency("capybara", "~> 2.0")
   spec.add_dependency("selenium-webdriver")
-  
+  spec.add_dependency("capybara-webkit")
+
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-debugger"
+  spec.add_development_dependency "pry-stack_explorer"
+  spec.add_development_dependency "pry-rescue"
   spec.add_development_dependency "tddium"
 
   # Sinatra is used by Capybara's TestApp
