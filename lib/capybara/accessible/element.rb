@@ -6,7 +6,7 @@ module Capybara
       def click
         synchronize { base.click }
 
-        if Capybara.current_driver == :accessible
+        if @session.driver.is_a? Capybara::Accessible::Driver
           begin
             @session.driver.browser.switch_to.alert
             puts "Skipping accessibility audit: Modal dialog present"
@@ -19,7 +19,7 @@ module Capybara
               end
             end
           end
-        elsif Capybara.current_driver == :accessible_webkit
+        elsif @session.driver.is_a? Capybara::Accessible::WebkitDriver
           if webkit_audit_failures.any?
             raise Capybara::Accessible::InaccessibleError, webkit_failure_messages
           end
