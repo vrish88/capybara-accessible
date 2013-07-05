@@ -16,5 +16,3 @@ RSpec.configure do |c|
     Capybara::Accessible.skip_audit { example.run }
   end
 end
-
-Capybara.current_driver = :accessible_webkit
