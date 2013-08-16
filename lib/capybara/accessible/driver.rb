@@ -4,7 +4,7 @@ module Capybara::Accessible
 
     def visit(path)
       super
-      if Capybara.current_driver == :accessible && audit_failures.any?
+      if audit_failures.any?
         if Capybara::Accessible::Auditor.log_level == :warn
           puts failure_messages
         else
