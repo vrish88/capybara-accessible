@@ -3,6 +3,7 @@
 .bundle
 .config
 .tddium*
+.vimlog
 .yardoc
 Gemfile.lock
 InstalledFiles
