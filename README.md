@@ -87,6 +87,14 @@ You can disable audits on individual tests by tagging the example or group with 
       Then I should see the inaccessible image # this assertion will still be executed
 
 
+### Changing the severity of audit rules
+
+If you'd like to enforce certain rules and raise errors instead of showing them as warnings, 
+for example images should never have alt attributes, you can configure it as follows:
+
+    Capybara::Accessible::Auditor.severe_rules = ['AX_TEXT_02']
+
+
 ## Support
 
 If you think you've found a bug, or have installation questions or feature requests, please send a message 
