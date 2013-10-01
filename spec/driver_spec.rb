@@ -52,5 +52,19 @@ describe Capybara::Accessible::Driver do
         expect { @session.click_link('Alert!') }.to_not raise_error
       end
     end
+
+    context 'with severity set to severe' do
+      before do
+        Capybara::Accessible::Auditor.severe_rules = ['AX_TEXT_02']
+      end
+
+      after do
+        Capybara::Accessible::Auditor.severe_rules = []
+      end
+
+      it 'raises an exception on the image without alt text' do
+        expect { @session.visit('/severe') }.to raise_error(Capybara::Accessible::InaccessibleError)
+      end
+    end
   end
 end
