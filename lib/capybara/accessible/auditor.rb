@@ -27,6 +27,14 @@ module Capybara::Accessible
       @@log_level ||= :error
     end
 
+    def self.severe_rules=(rules)
+      @@severe_rules = rules
+    end
+
+    def self.severe_rules
+      @@severe_rules ||= []
+    end
+
     def audit_rules
       File.read(File.expand_path("../../../vendor/google/accessibility-developer-tools/axs_testing.js", __FILE__))
     end
@@ -49,14 +57,30 @@ module Capybara::Accessible
       <<-JAVASCRIPT
         #{audit_rules}
         var config = new axs.AuditConfiguration();
+        var severe_rules = #{severe_rules.to_json};
+        var rule;
+
+        for(rule in severe_rules) {
+          config.setSeverity(severe_rules[rule], axs.constants.Severity.SEVERE);
+        }
         config.auditRulesToIgnore = #{excluded_rules.to_json};
+
         var results = axs.Audit.run(config);
       JAVASCRIPT
     end
 
     def excluded_rules
       codes = Capybara::Accessible::Auditor.exclusions
-      mapping = {
+      codes.map { |code| mapping[code]}
+    end
+
+    def severe_rules
+      codes = Capybara::Accessible::Auditor.severe_rules
+      codes.map { |code| mapping[code]}
+    end
+
+    def mapping
+      @mapping ||= {
         'AX_ARIA_01' => 'badAriaRole',
         'AX_ARIA_02' => 'nonExistentAriaLabelledbyElement',
         'AX_ARIA_03' => 'requiredAriaAttributeMissing',
@@ -73,8 +97,6 @@ module Capybara::Accessible
         # 'AX_TITLE_01' => 'linkWithUnclearPurpose', # This has a duplicate name
         # 'AX_ARIA_05' => '', # This has no rule associated with it
       }
-
-      codes.map { |code| mapping[code]}
     end
 
     def page_url
