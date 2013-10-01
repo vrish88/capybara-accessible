@@ -36,6 +36,10 @@ describe Capybara::Accessible::Driver do
         Capybara::Accessible::Auditor.log_level = :warn
       end
 
+      after do
+        Capybara::Accessible::Auditor.log_level = :error
+      end
+
       it 'puts to stdout and does not raise an error' do
         $stdout.should_receive(:puts)
         expect { @session.visit('/inaccessible') }.to_not raise_error
