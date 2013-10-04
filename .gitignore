@@ -3,6 +3,7 @@
 .bundle
 .config
 .rspec
+.vimlog
 .yardoc
 Gemfile.lock
 InstalledFiles
