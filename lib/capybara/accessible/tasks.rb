@@ -6,7 +6,8 @@ namespace :capybara_accessible do
 
   desc 'Report total number of integration tests that are accessible/inaccessible'
   task :report_inaccessible_tests do
-    directories = Dir["features/**"].concat(Dir['spec/features/**'])
+    directories_to_exclude = ['features/support']
+    directories = Dir['features/**'].concat(Dir['spec/features/**']) - directories_to_exclude
     directories.map! { |d| [d.split('/').last, d]}
     directories.sort!
 
