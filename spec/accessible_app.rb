@@ -16,4 +16,8 @@ class AccessibleApp < TestApp
   get '/alert' do
     '<a href="#" onclick="alert(\'whoa!\')">Alert!</a>'
   end
+
+  get '/severe' do
+    '<img src="" />'
+  end
 end

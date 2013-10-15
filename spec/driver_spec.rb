@@ -36,6 +36,10 @@ describe Capybara::Accessible::Driver do
         Capybara::Accessible::Auditor.log_level = :warn
       end
 
+      after do
+        Capybara::Accessible::Auditor.log_level = :error
+      end
+
       it 'puts to stdout and does not raise an error' do
         $stdout.should_receive(:puts)
         expect { @session.visit('/inaccessible') }.to_not raise_error
@@ -46,6 +50,20 @@ describe Capybara::Accessible::Driver do
       it 'does not raise an exception' do
         @session.visit('/alert')
         expect { @session.click_link('Alert!') }.to_not raise_error
+      end
+    end
+
+    context 'with severity set to severe' do
+      before do
+        Capybara::Accessible::Auditor.severe_rules = ['AX_TEXT_02']
+      end
+
+      after do
+        Capybara::Accessible::Auditor.severe_rules = []
+      end
+
+      it 'raises an exception on the image without alt text' do
+        expect { @session.visit('/severe') }.to raise_error(Capybara::Accessible::InaccessibleError)
       end
     end
   end
