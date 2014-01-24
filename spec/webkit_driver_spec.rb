@@ -1,8 +1,12 @@
 require 'spec_helper'
 
 describe Capybara::Accessible::WebkitDriver do
+  module TestSessions
+    WebkitRackTest = Capybara::Session.new(:accessible_webkit, AccessibleApp)
+  end
+
   before do
-    @session = Capybara::Session.new(:accessible_webkit, AccessibleApp)
+    @session = TestSessions::WebkitRackTest
   end
 
   context 'a page without accessibility errors' do
@@ -27,7 +31,7 @@ describe Capybara::Accessible::WebkitDriver do
       end
 
       it 'does not raise an error on an excluded rule' do
-        expect { @session.visit('/excluded') }.to_not raise_error(Capybara::Accessible::InaccessibleError)
+        expect { @session.visit('/excluded') }.to_not raise_error
       end
     end
   end

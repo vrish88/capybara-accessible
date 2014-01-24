@@ -1,8 +1,12 @@
 require 'spec_helper'
 
 describe Capybara::Accessible::Driver do
+  module TestSessions
+    RackTest = Capybara::Session.new(:accessible, AccessibleApp)
+  end
+
   before do
-    @session = Capybara::Session.new(:accessible, AccessibleApp)
+    @session = TestSessions::RackTest
   end
 
   context 'a page without accessibility errors' do

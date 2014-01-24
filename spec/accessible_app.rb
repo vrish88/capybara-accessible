@@ -1,4 +1,7 @@
-class AccessibleApp < TestApp
+require 'sinatra/base'
+require 'rack'
+
+class AccessibleApp < Sinatra::Base
   get '/accessible' do
     '<form><label for="foo">Foo</label>' +
     '<input type="text" name="foo" id="foo"/></form>' +
