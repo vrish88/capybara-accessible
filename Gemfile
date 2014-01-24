@@ -1,4 +1,13 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in capybara-praseodymium.gemspec
 gemspec
+
+gem "sauce"
+gem "sauce-connect"
+
+group :development, :test do
+  gem "tddium"
+  gem "sinatra"
+  gem "pry"
+  gem "rspec"
+end
