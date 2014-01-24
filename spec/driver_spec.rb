@@ -51,6 +51,10 @@ describe Capybara::Accessible::Driver do
     end
 
     context 'a page with a javascript popup' do
+      after do
+        @session.driver.browser.switch_to.alert.dismiss
+      end
+
       it 'does not raise an exception' do
         @session.visit('/alert')
         expect { @session.click_link('Alert!') }.to_not raise_error
