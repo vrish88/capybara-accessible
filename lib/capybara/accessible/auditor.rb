@@ -10,7 +10,19 @@ module Capybara::Accessible
     end
   end
 
-  module Auditor
+  class Auditor
+    class Node < self
+      def initialize(session)
+        @driver = session.driver
+      end
+    end
+
+    class Driver < self
+      def initialize(driver)
+        @driver = driver
+      end
+    end
+
     def self.exclusions=(rules)
       @@exclusions = rules
     end
@@ -35,9 +47,18 @@ module Capybara::Accessible
       @@severe_rules ||= []
     end
 
-    def audit_rules
-      File.read(File.expand_path("../../../vendor/google/accessibility-developer-tools/axs_testing.js", __FILE__))
+    def audit!
+      if audit_failures.any?
+        if Capybara::Accessible::Auditor.log_level == :warn
+          puts failure_messages
+        else
+          raise Capybara::Accessible::InaccessibleError, failure_messages
+        end
+      end
     end
+
+    private
+    attr_reader :driver
 
     def audit_failures
       if Capybara::Accessible.instance_variable_get(:@disabled)
@@ -51,7 +72,9 @@ module Capybara::Accessible
       "Found at #{page_url} \n\n" + run_script("#{perform_audit_script} return axs.Audit.createReport(results)")
     end
 
-    private
+    def audit_rules
+      File.read(File.expand_path("../../../vendor/google/accessibility-developer-tools/axs_testing.js", __FILE__))
+    end
 
     def perform_audit_script
       <<-JAVASCRIPT
@@ -81,34 +104,30 @@ module Capybara::Accessible
 
     def mapping
       @mapping ||= {
-        'AX_ARIA_01' => 'badAriaRole',
-        'AX_ARIA_02' => 'nonExistentAriaLabelledbyElement',
-        'AX_ARIA_03' => 'requiredAriaAttributeMissing',
-        'AX_ARIA_04' => 'badAriaAttributeValue',
-        'AX_TEXT_01' => 'controlsWithoutLabel',
-        'AX_TEXT_02' => 'imagesWithoutAltText',
-        'AX_TITLE_01' => 'pageWithoutTitle',
-        'AX_IMAGE_01' => 'elementsWithMeaningfulBackgroundImage',
-        'AX_FOCUS_01' => 'focusableElementNotVisibleAndNotAriaHidden',
-        'AX_FOCUS_02' => 'unfocusableElementsWithOnClick',
-        'AX_COLOR_01' => 'lowContrastElements',
-        'AX_VIDEO_01' => 'videoWithoutCaptions',
-        'AX_AUDIO_01' => 'audioWithoutControls'
-        # 'AX_TITLE_01' => 'linkWithUnclearPurpose', # This has a duplicate name
-        # 'AX_ARIA_05' => '', # This has no rule associated with it
+          'AX_ARIA_01' => 'badAriaRole',
+          'AX_ARIA_02' => 'nonExistentAriaLabelledbyElement',
+          'AX_ARIA_03' => 'requiredAriaAttributeMissing',
+          'AX_ARIA_04' => 'badAriaAttributeValue',
+          'AX_TEXT_01' => 'controlsWithoutLabel',
+          'AX_TEXT_02' => 'imagesWithoutAltText',
+          'AX_TITLE_01' => 'pageWithoutTitle',
+          'AX_IMAGE_01' => 'elementsWithMeaningfulBackgroundImage',
+          'AX_FOCUS_01' => 'focusableElementNotVisibleAndNotAriaHidden',
+          'AX_FOCUS_02' => 'unfocusableElementsWithOnClick',
+          'AX_COLOR_01' => 'lowContrastElements',
+          'AX_VIDEO_01' => 'videoWithoutCaptions',
+          'AX_AUDIO_01' => 'audioWithoutControls'
+          # 'AX_TITLE_01' => 'linkWithUnclearPurpose', # This has a duplicate name
+          # 'AX_ARIA_05' => '', # This has no rule associated with it
       }
     end
 
     def page_url
-      @session ? @session.driver.current_url : current_url
+      driver.current_url
     end
 
     def run_script(script)
-      if @session
-        @session.driver.execute_script(script)
-      else
-        execute_script(script)
-      end
+      driver.execute_script(script)
     end
   end
 end

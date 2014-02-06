@@ -9,8 +9,10 @@ module Capybara
   end
 end
 
-require "capybara/accessible/driver"
+require "capybara/accessible/selenium_extensions"
 
 Capybara.register_driver :accessible do |app|
-  Capybara::Accessible::Driver.new(app)
+  Capybara::Selenium::Driver.new(app).tap do |driver|
+    driver.extend(Capybara::Accessible::SeleniumExtensions)
+  end
 end

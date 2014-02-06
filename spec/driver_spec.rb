@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Capybara::Accessible::Driver do
+describe "Capybara::Accessible::Driver" do
   before do
     @session = Capybara::Session.new(:accessible, AccessibleApp)
   end
