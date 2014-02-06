@@ -48,7 +48,6 @@ module Capybara
       end
     end
 
-
     class PoltergeistDriverAdapter
       def modal_dialog_present?(driver)
         false
@@ -70,10 +69,10 @@ module Capybara
 
     class << self
       def skip_audit
-        @disabled = true
+        Capybara::Accessible::Auditor.disable
         yield
       ensure
-        @disabled = false
+        Capybara::Accessible::Auditor.enable
       end
 
       def driver_adapter

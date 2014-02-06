@@ -27,50 +27,66 @@ module Capybara::Accessible
       end
     end
 
-    def self.exclusions=(rules)
-      @@exclusions = rules
-    end
+    class <<self
+      def exclusions=(rules)
+        @exclusions = rules
+      end
 
-    def self.exclusions
-      @@exclusions ||= []
-    end
+      def exclusions
+        @exclusions ||= []
+      end
 
-    def self.log_level=(level)
-      @@log_level= level
-    end
+      def log_level=(level)
+        @log_level = level
+      end
 
-    def self.log_level
-      @@log_level ||= :error
-    end
+      def log_level
+        @log_level ||= :error
+      end
 
-    def self.severe_rules=(rules)
-      @@severe_rules = rules
-    end
+      def severe_rules=(rules)
+        @severe_rules = rules
+      end
 
-    def self.severe_rules
-      @@severe_rules ||= []
+      def severe_rules
+        @severe_rules ||= []
+      end
+
+      def disable
+        @disabled = true
+      end
+
+      def enable
+        @disabled = false
+      end
+
+      def disabled?
+        @disabled
+      end
     end
 
     def audit!
-      failures = audit_failures
-      if !failures.nil? && failures.any?
-        if Capybara::Accessible::Auditor.log_level == :warn
-          puts failure_messages
-        else
-          raise Capybara::Accessible::InaccessibleError, failure_messages
-        end
+      return if Auditor.disabled?
+
+      if failures?
+        log_level_response[Capybara::Accessible::Auditor.log_level].call(failure_messages)
       end
     end
 
     private
     attr_reader :driver
 
-    def audit_failures
-      if Capybara::Accessible.instance_variable_get(:@disabled)
-        []
-      else
-        run_script(perform_audit_script + driver_adaptor.failures_script)
-      end
+    def log_level_response
+      @log_level_response ||= {
+          warn: ->(messages) { puts messages },
+          error: ->(messages) { raise Capybara::Accessible::InaccessibleError, failure_messages }
+      }
+    end
+
+    def failures?
+      failures = run_script(perform_audit_script + driver_adaptor.failures_script)
+
+      Array(failures).any?
     end
 
     def failure_messages
