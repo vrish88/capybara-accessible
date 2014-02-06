@@ -31,14 +31,24 @@ Add `gem 'capybara-accessible'` to your application's Gemfile and run `bundle` o
 
 ## Usage
 
-You can use capybara-accessible as a drop-in replacement for Rack::Test, Selenium or capybara-webkit drivers for Capybara.
+You can use capybara-accessible as a drop-in replacement for Rack::Test, Selenium, capybara-webkit, or Poltergeist drivers for Capybara.
 Simply set the driver in `spec/spec_helper.rb` or `features/support/env.rb`:
 
     require 'capybara/rspec'
     require 'capybara/accessible'
 
-    Capybara.default_driver = :accessible
-    Capybara.javascript_driver = :accessible
+    # For selenium integration
+    Capybara.default_driver = :accessible_selenium
+    Capybara.javascript_driver = :accessible_selenium
+
+    # For capybara webkit integration
+    Capybara.default_driver = :accessible_webkit
+    Capybara.javascript_driver = :accessible_webkit
+
+    # For poltergeist integration
+    Capybara.default_driver = :accessible_poltergeist
+    Capybara.javascript_driver = :accessible_poltergeist
+
 
 We suggest that you use [pry-rescue with pry-stack_explorer](https://github.com/ConradIrwin/pry-rescue) 
 to debug the accessibility failures in the DOM. pry-rescue will open a debugging session at the first exception, 
