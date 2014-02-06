@@ -48,6 +48,26 @@ module Capybara
       end
     end
 
+
+    class PoltergeistDriverAdapter
+      def modal_dialog_present?(driver)
+        false
+      end
+
+      def failures_script
+        "return axs.Audit.auditResults(results).getErrors()"
+      end
+
+      def create_report_script
+        "return axs.Audit.createReport(results)"
+      end
+
+      def run_javascript(driver, script)
+        # Have to wrap in an anonymous function because of https://github.com/jonleighton/poltergeist/issues/198
+        driver.evaluate_script %{ (function() {#{script}})() }
+      end
+    end
+
     class << self
       def skip_audit
         @disabled = true
@@ -78,5 +98,11 @@ end
 Capybara.register_driver :webkit_accessible do |app|
   driver = Capybara::Webkit::Driver.new(app)
   adaptor = Capybara::Accessible::WebkitDriverAdapter.new
+  Capybara::Accessible.setup(driver, adaptor)
+end
+
+Capybara.register_driver :poltergeist_accessible do |app|
+  driver = Capybara::Poltergeist::Driver.new(app)
+  adaptor = Capybara::Accessible::PoltergeistDriverAdapter.new
   Capybara::Accessible.setup(driver, adaptor)
 end
