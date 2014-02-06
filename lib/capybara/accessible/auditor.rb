@@ -1,6 +1,17 @@
 module Capybara::Accessible
   class InaccessibleError < Capybara::CapybaraError; end
 
+  class SeleniumDriverAdapter
+    def modal_dialog_present?(driver)
+      begin
+        driver.browser.switch_to.alert
+        true
+      rescue ::Selenium::WebDriver::Error::NoAlertOpenError, ::NoMethodError
+        false
+      end
+    end
+  end
+
   class << self
     def skip_audit
       @disabled = true
@@ -8,12 +19,37 @@ module Capybara::Accessible
     ensure
       @disabled = false
     end
+
+    def driver_adapter
+      @driver_adapter
+    end
+
+    def driver(app)
+      driver = Capybara::Selenium::Driver.new(app)
+      @driver_adapter = Capybara::Accessible::SeleniumDriverAdapter.new
+
+      driver.extend(Capybara::Accessible::DriverExtensions)
+      driver
+    end
   end
 
   class Auditor
     class Node < self
       def initialize(session)
         @driver = session.driver
+      end
+
+      def audit!
+        if modal_dialog_present?
+          puts "Skipping accessibility audit: Modal dialog present"
+        else
+          super
+        end
+      end
+
+      private
+      def modal_dialog_present?
+        Capybara::Accessible.driver_adapter.modal_dialog_present?(driver)
       end
     end
 
