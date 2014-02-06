@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Using webkit driver" do
   require "capybara-webkit"
   before do
-    @session = Capybara::Session.new(:webkit_accessible, AccessibleApp)
+    @session = Capybara::Session.new(:accessible_webkit, AccessibleApp)
   end
 
   context 'a page without accessibility errors' do

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe "Capybara::Accessible::Driver" do
+describe "Using poltergeist driver" do
   require "capybara/poltergeist"
   before do
-    @session = Capybara::Session.new(:poltergeist_accessible, AccessibleApp)
+    @session = Capybara::Session.new(:accessible_poltergeist, AccessibleApp)
   end
 
   context 'a page without accessibility errors' do

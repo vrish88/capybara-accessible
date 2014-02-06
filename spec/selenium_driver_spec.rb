@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe "Capybara::Accessible::Driver" do
+describe "Using selenium driver" do
   before do
-    @session = Capybara::Session.new(:accessible, AccessibleApp)
+    @session = Capybara::Session.new(:accessible_selenium, AccessibleApp)
   end
 
   context 'a page without accessibility errors' do
