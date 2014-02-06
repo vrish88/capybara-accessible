@@ -19,8 +19,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency("capybara", "~> 2.0")
-  spec.add_dependency("selenium-webdriver")
-  
+
+  spec.add_development_dependency "selenium-webdriver"
+  spec.add_development_dependency "capybara-webkit"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"

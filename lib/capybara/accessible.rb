@@ -11,5 +11,13 @@ module Capybara
 end
 
 Capybara.register_driver :accessible do |app|
-  Capybara::Accessible.driver(app)
+  driver = Capybara::Selenium::Driver.new(app)
+  adaptor = Capybara::Accessible::SeleniumDriverAdapter.new
+  Capybara::Accessible.setup(driver, adaptor)
+end
+
+Capybara.register_driver :webkit_accessible do |app|
+  driver = Capybara::Webkit::Driver.new(app)
+  adaptor = Capybara::Accessible::WebkitDriverAdapter.new
+  Capybara::Accessible.setup(driver, adaptor)
 end

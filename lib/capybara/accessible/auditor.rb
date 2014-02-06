@@ -10,6 +10,36 @@ module Capybara::Accessible
         false
       end
     end
+
+    def failures_script
+      "return axs.Audit.auditResults(results).getErrors();"
+    end
+
+    def create_report_script
+      "return axs.Audit.createReport(results);"
+    end
+
+    def run_javascript(driver, script)
+      driver.execute_script(script)
+    end
+  end
+
+  class WebkitDriverAdapter
+    def modal_dialog_present?(driver)
+      driver.alert_messages.any?
+    end
+
+    def failures_script
+      "axs.Audit.auditResults(results).getErrors();"
+    end
+
+    def create_report_script
+      "axs.Audit.createReport(results);"
+    end
+
+    def run_javascript(driver, script)
+      driver.evaluate_script(script)
+    end
   end
 
   class << self
@@ -24,10 +54,8 @@ module Capybara::Accessible
       @driver_adapter
     end
 
-    def driver(app)
-      driver = Capybara::Selenium::Driver.new(app)
-      @driver_adapter = Capybara::Accessible::SeleniumDriverAdapter.new
-
+    def setup(driver, adaptor)
+      @driver_adapter = adaptor
       driver.extend(Capybara::Accessible::DriverExtensions)
       driver
     end
@@ -84,7 +112,8 @@ module Capybara::Accessible
     end
 
     def audit!
-      if audit_failures.any?
+      failures = audit_failures
+      if !failures.nil? && failures.any?
         if Capybara::Accessible::Auditor.log_level == :warn
           puts failure_messages
         else
@@ -100,12 +129,13 @@ module Capybara::Accessible
       if Capybara::Accessible.instance_variable_get(:@disabled)
         []
       else
-        run_script("#{perform_audit_script} return axs.Audit.auditResults(results).getErrors();")
+        run_script(perform_audit_script + driver_adaptor.failures_script)
       end
     end
 
     def failure_messages
-      "Found at #{page_url} \n\n" + run_script("#{perform_audit_script} return axs.Audit.createReport(results)")
+      result = run_script(perform_audit_script + driver_adaptor.create_report_script)
+      "Found at #{page_url} \n\n#{result}"
     end
 
     def audit_rules
@@ -163,7 +193,11 @@ module Capybara::Accessible
     end
 
     def run_script(script)
-      driver.execute_script(script)
+      driver_adaptor.run_javascript(driver, script)
+    end
+
+    def driver_adaptor
+      Capybara::Accessible.driver_adapter
     end
   end
 end
